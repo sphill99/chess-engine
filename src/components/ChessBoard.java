@@ -4,14 +4,17 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.border.*;
 
 import components.Piece.Type;
 
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 @SuppressWarnings("serial") 
 public class ChessBoard extends JComponent {
@@ -36,39 +39,49 @@ public class ChessBoard extends JComponent {
 					public void mouseClicked(MouseEvent e) {
 						int x = e.getX();
 		                int y = e.getY();
-		                
-		                System.out.println("X: " + x + ", Y: " + y);
-		                
 		                if (!pieceSelected) {
 		                	Cell c = cb.getCell(y, x);
-			                if (c != null) {
-			                	if (c.getPiece() != null) {
-			                		System.out.println("Real X: " + c.getX() + ", Real Y: " + c.getY());
-			                		if (c.getPiece().isWhite() == whiteTurn) {
-			                			pieceSelected = true;
-				                		ArrayList<Cell> moves =  c.getMoves(cb, whiteTurn);
-				                		listOfMoves = moves;
-				                		selected = c;
-				                		for (int i = 0; i < moves.size(); i++) {
-				                			Cell c1 = moves.get(i);
-				                			c1.makeSelection();
-				                		}
-				                	}
-			                	}
-			                }
+	                		if (c != null && c.getPiece() != null && c.getPiece().isWhite() == whiteTurn) {
+	                			pieceSelected = true;
+		                		ArrayList<Cell> moves =  c.getMoves(cb, whiteTurn);
+		                		listOfMoves = moves;
+		                		selected = c;
+		                		for (int i = 0; i < moves.size(); i++) {
+		                			Cell c1 = moves.get(i);
+		                			c1.makeSelection();
+		                			System.out.println(c1.getX() + ", " + c1.getY());
+		                		}
+		                	}
 		                } else {
 		                	Cell c = cb.getCell(y, x);
 		                	if (listOfMoves.contains(c)) {
 		                		Piece p = c.setPiece(selected.getPiece());
 		                		selected.setPiece(null);
 		                		whiteTurn = !whiteTurn;
-		                		colorBoard[c.getX()][c.getY()] = whiteTurn ? 2 : 1;
+		                		colorBoard[c.getX()][c.getY()] = whiteTurn ? 1 : 2;
 		                		colorBoard[selected.getX()][selected.getY()] = 0;
+		                		
+		                		selected = null;
+			                	pieceSelected = false;
+			                	clearCells();
+			                	listOfMoves = new ArrayList<>();
+		                	} else if (c.getPiece() != null && c.getPiece().isWhite() == selected.getPiece().isWhite()) {
+		                		pieceSelected = true;
+		                		ArrayList<Cell> moves =  c.getMoves(cb, whiteTurn);
+		                		listOfMoves = moves;
+		                		selected = c;
+		                		clearCells();
+		                		for (int i = 0; i < moves.size(); i++) {
+		                			Cell c1 = moves.get(i);
+		                			c1.makeSelection();
+		                			System.out.println(c1.getX() + ", " + c1.getY());
+		                		}
+		                	} else {
+		                		selected = null;
+			                	pieceSelected = false;
+			                	clearCells();
+			                	listOfMoves = new ArrayList<>();
 		                	}
-		                	selected = null;
-		                	pieceSelected = false;
-		                	clearCells();
-		                	listOfMoves = new ArrayList<>();
 		                }
 		                
 		                repaint();
@@ -221,14 +234,18 @@ public class ChessBoard extends JComponent {
 	
 	@Override
 	public void paintComponent(Graphics gc) {
-		gc.drawLine(0, 0, 5, 5);
+		Graphics2D g2 = (Graphics2D) gc;
+		g2.setStroke(new BasicStroke(10));
+		gc.setColor(Color.LIGHT_GRAY);
+		g2.fillRect(0, 0, 750, 750);
+		g2.setColor(Color.BLACK);
+		g2.drawRect(100, 100, 8 * 70, 8 * 70);
 		for (int i = 0; i < 8; i++) {
 			for (int j = 0; j < 8; j++) {
 				Cell c = board[i][j];
 				try {
-					c.drawCell(gc);
+					c.drawCell(g2);
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}

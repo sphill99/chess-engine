@@ -73,8 +73,8 @@ public class Cell implements Comparable<Cell> {
 				moves.add(cellBoard[newX][y + 1]);
 			}
 			
-			if (y - 1 >= 0 && board[newX][y - 1] + type == 3) {
-				moves.add(cellBoard[newX][y + 1]);
+			if (y - 1 >= 0 && board[newX][y - 1] != type && board[newX][y - 1] != 0) {
+				moves.add(cellBoard[newX][y - 1]);
 			}
 			
 			if (white && x == 6 && board[5][y] == 0 && board[4][y] == 0) {
@@ -103,7 +103,7 @@ public class Cell implements Comparable<Cell> {
 			while(directions[0] >= 0 && directions[1] >= 0) {
 				if (board[directions[0]][directions[1]] == 0) {
 					moves.add(cellBoard[directions[0]][directions[1]]);
-				} else if (board[directions[0]][directions[1]] + type == 3) {
+				} else if (board[directions[0]][directions[1]] != type) {
 					moves.add(cellBoard[directions[0]][directions[1]]);
 					break;
 				} else {
@@ -116,7 +116,7 @@ public class Cell implements Comparable<Cell> {
 			while(directions[2] >= 0 && directions[3] <= 7) {
 				if (board[directions[2]][directions[3]] == 0) {
 					moves.add(cellBoard[directions[2]][directions[3]]);
-				} else if (board[directions[2]][directions[3]] + type == 3) {
+				} else if (board[directions[2]][directions[3]] != type) {
 					moves.add(cellBoard[directions[2]][directions[3]]);
 					break;
 				} else {
@@ -129,7 +129,7 @@ public class Cell implements Comparable<Cell> {
 			while(directions[4] <= 7 && directions[5] >= 0) {
 				if (board[directions[4]][directions[5]] == 0) {
 					moves.add(cellBoard[directions[4]][directions[5]]);
-				} else if (board[directions[4]][directions[5]] + type == 3) {
+				} else if (board[directions[4]][directions[5]] != type) {
 					moves.add(cellBoard[directions[4]][directions[5]]);
 					break;
 				} else {
@@ -142,7 +142,7 @@ public class Cell implements Comparable<Cell> {
 			while(directions[6] <= 7 && directions[7] <= 7) {
 				if (board[directions[6]][directions[7]] == 0) {
 					moves.add(cellBoard[directions[6]][directions[7]]);
-				} else if (board[directions[6]][directions[7]] + type == 3) {
+				} else if (board[directions[6]][directions[7]] != type) {
 					moves.add(cellBoard[directions[6]][directions[7]]);
 					break;
 				} else {
@@ -170,7 +170,7 @@ public class Cell implements Comparable<Cell> {
 			while(directions[0] >= 0) {
 				if (board[directions[0]][y] == 0) {
 					moves.add(cellBoard[directions[0]][y]);
-				} else if (board[directions[0]][y] + type == 3) {
+				} else if (board[directions[0]][y] != type) {
 					moves.add(cellBoard[directions[0]][y]);
 					break;
 				} else {
@@ -182,7 +182,7 @@ public class Cell implements Comparable<Cell> {
 			while(directions[1] >= 0) {
 				if (board[x][directions[1]] == 0) {
 					moves.add(cellBoard[x][directions[1]]);
-				} else if (board[x][directions[1]] + type == 3) {
+				} else if (board[x][directions[1]] != type) {
 					moves.add(cellBoard[x][directions[1]]);
 					break;
 				} else {
@@ -194,7 +194,7 @@ public class Cell implements Comparable<Cell> {
 			while(directions[2] <= 7) {
 				if (board[directions[2]][y] == 0) {
 					moves.add(cellBoard[directions[2]][y]);
-				} else if (board[directions[2]][y] + type == 3) {
+				} else if (board[directions[2]][y] != type) {
 					moves.add(cellBoard[directions[2]][y]);
 					break;
 				} else {
@@ -206,7 +206,7 @@ public class Cell implements Comparable<Cell> {
 			while(directions[3] <= 7) {
 				if (board[x][directions[3]] == 0) {
 					moves.add(cellBoard[x][directions[3]]);
-				} else if (board[x][directions[3]] + type == 3) {
+				} else if (board[x][directions[3]] != type) {
 					moves.add(cellBoard[x][directions[3]]);
 					break;
 				} else {
@@ -245,7 +245,7 @@ public class Cell implements Comparable<Cell> {
 					if (i == x && j == y) {
 						continue;
 					}
-					if (board[i][j] == 0 || board[i][j] + type == 3) {
+					if (board[i][j] != type) {
 						moves.add(cellBoard[i][j]);
 					}
 				}
@@ -326,7 +326,7 @@ public class Cell implements Comparable<Cell> {
 			gc.drawImage(getImage(p), getAdjustedX() + 5, getAdjustedY() + 5, 60, 60, null);
 		}
 		if (isSelected) {
-			gc.setColor(new Color(0, 0, 0, 50));
+			gc.setColor(new Color(0, 0, 0, 70));
 			gc.fillOval(getAdjustedX() + 25, getAdjustedY() + 25, 15, 15);
 		}
 	}
