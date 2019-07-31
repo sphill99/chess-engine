@@ -1,43 +1,242 @@
 package components;
 
 import java.awt.*;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+
 import javax.swing.*;
 import javax.swing.border.*;
+
+import components.Piece.Type;
+
 import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.util.ArrayList;
 
 @SuppressWarnings("serial") 
 public class ChessBoard extends JComponent {
 	Cell[][] board = new Cell[8][8];
-	private JPanel gameBoard;
-
+	int[][] colorBoard = new int[8][8];
+	boolean whiteTurn = true;
+	private ChessBoard cb;
+	private boolean pieceSelected;
+	private ArrayList<Cell> listOfMoves;
+	private Cell selected;
 	
 	public ChessBoard() {
+		cb = this;
+		pieceSelected = false;
+		listOfMoves = new ArrayList<Cell>();
+		selected = null;
 		setUpGame();
+		
+		addMouseListener( new MouseListener() {
+
+					@Override
+					public void mouseClicked(MouseEvent e) {
+						int x = e.getX();
+		                int y = e.getY();
+		                
+		                System.out.println("X: " + x + ", Y: " + y);
+		                
+		                if (!pieceSelected) {
+		                	Cell c = cb.getCell(y, x);
+			                if (c != null) {
+			                	if (c.getPiece() != null) {
+			                		System.out.println("Real X: " + c.getX() + ", Real Y: " + c.getY());
+			                		if (c.getPiece().isWhite() == whiteTurn) {
+			                			pieceSelected = true;
+				                		ArrayList<Cell> moves =  c.getMoves(cb, whiteTurn);
+				                		listOfMoves = moves;
+				                		selected = c;
+				                		for (int i = 0; i < moves.size(); i++) {
+				                			Cell c1 = moves.get(i);
+				                			c1.makeSelection();
+				                		}
+				                	}
+			                	}
+			                }
+		                } else {
+		                	Cell c = cb.getCell(y, x);
+		                	if (listOfMoves.contains(c)) {
+		                		Piece p = c.setPiece(selected.getPiece());
+		                		selected.setPiece(null);
+		                		whiteTurn = !whiteTurn;
+		                		colorBoard[c.getX()][c.getY()] = whiteTurn ? 2 : 1;
+		                		colorBoard[selected.getX()][selected.getY()] = 0;
+		                	}
+		                	selected = null;
+		                	pieceSelected = false;
+		                	clearCells();
+		                	listOfMoves = new ArrayList<>();
+		                }
+		                
+		                repaint();
+		             //   System.out.println("THE MOUSE WAS PRESSED");
+						
+					}
+
+					@Override
+					public void mousePressed(MouseEvent e) {
+						// TODO Auto-generated method stub
+						
+					}
+
+					@Override
+					public void mouseReleased(MouseEvent e) {
+						// TODO Auto-generated method stub
+						
+					}
+
+					@Override
+					public void mouseEntered(MouseEvent e) {
+						// TODO Auto-generated method stub
+						
+					}
+
+					@Override
+					public void mouseExited(MouseEvent e) {
+						// TODO Auto-generated method stub
+						
+					}
+		        });
 	}
 	
-	/*
-	 * Pawn = 1
-	 * Knight = 2
-	 * Bishop = 3
-	 * Rook = 4
-	 * Queen = 5
-	 * King = 6
-	 * Empty = 0
-	*/
+	public Cell getCell(int x, int y) {
+		int size = Cell.getSize();
+		x = x - 100;
+		y = y - 100;
+		
+		if (x < 0 || y < 0 || x > 8 * size || y > 8 * size) {
+			System.out.println("NULL RETURN");
+			return null;
+		}
+		
+		x = x / 70;
+		y = y / 70;
+		
+		System.out.println("X Coord: " + x + ", Y Coord: " + y);
+		return board[x][y];
+	}
+	
 	public void setUpGame() {
-       
-		gameBoard = new JPanel(new GridLayout(0, 9));
-		gameBoard.setBorder(new LineBorder(Color.DARK_GRAY));
-		this.add(gameBoard);
-		//Set up black back row
-		Cell[0][0] = new Cell()
+		for (int i = 0; i < 2; i++) {
+			for (int j = 0; j < 8; j++) {
+				colorBoard[i][j] = 1;
+			}
+		}
+		
+		for (int i = 6; i < 8; i++) {
+			for (int j = 0; j < 8; j++) {
+				colorBoard[i][j] = 2;
+			}
+		}
+		
+		for (int i = 0; i < 64; i++) {
+			int y = i % 8;
+			int x = i / 8;
+			Piece[] pieces = createPieces();
+			Cell c = null;
+			if (i == 0 || i == 7) {
+				c = new Cell(x, y, pieces[26]);
+			} else if (i == 1 || i == 6) {
+				c = new Cell(x, y, pieces[22]);
+			} else if (i == 2 || i == 5) {
+				c = new Cell(x, y, pieces[18]);
+			} else if (i == 3) {
+				c = new Cell(x, y, pieces[29]);
+			} else if (i == 4) {
+				c = new Cell(x, y, pieces[31]);
+			} else if (i == 56 || i == 63) {
+				c = new Cell(x, y, pieces[24]);
+			} else if (i == 57 || i == 62) {
+				c = new Cell(x, y, pieces[20]);
+			} else if (i == 58 || i == 61) {
+				c = new Cell(x, y, pieces[16]);
+			} else if (i == 59) {
+				c = new Cell(x, y, pieces[28]);
+			} else if (i == 60) {
+				c = new Cell(x, y, pieces[30]);
+			} else if (i >= 8 && i < 16) {
+				c = new Cell(x, y, pieces[8]);
+			} else if (i <= 55 && i >= 48) {
+				c = new Cell(x, y, pieces[1]);
+			} else {
+				c = new Cell(x, y, null);
+			}
+			board[x][y] = c;
+		}
 		repaint();
+	}
+	
+	public void clearCells() {
+		for (int i = 0; i < 8; i++) {
+			for (int j = 0; j < 8; j++) {
+				board[i][j].clearSelection();
+			}
+		}
+	}
+	
+	public int[][] getColorBoard() {
+		return colorBoard;
+	}
+	
+	public Cell[][] getBoard() {
+		return board;
 	}
 	
 	public Piece[] createPieces() {
 		Piece[] pieces = new Piece[32];
-		for (int i = )
+		for (int i = 0; i < 32; i++) {
+			Piece p = null;
+			if (i < 8) {
+				p = new Piece(true, Type.PAWN);
+			} else if (i < 16) {
+				p = new Piece(false, Type.PAWN);
+			} else if (i < 18) {
+				p = new Piece(true, Type.BISHOP);
+			} else if (i < 20) {
+				p = new Piece(false, Type.BISHOP);
+			} else if (i < 22) {
+				p = new Piece(true, Type.KNIGHT);
+			} else if (i < 24) {
+				p = new Piece(false, Type.KNIGHT);
+			} else if (i < 26) {
+				p = new Piece(true, Type.ROOK);
+			} else if (i < 28) {
+				p = new Piece(false, Type.ROOK);
+			} else if (i == 28) {
+				p = new Piece(true, Type.QUEEN);
+			} else if (i == 29) {
+				p = new Piece(false, Type.QUEEN);
+			} else if (i == 30) {
+				p = new Piece(true, Type.KING);
+			} else {
+				p = new Piece(false, Type.KING);
+			}
+			pieces[i] = p;
+		}
+		return pieces;
 	}
 	
+	@Override
+	public void paintComponent(Graphics gc) {
+		gc.drawLine(0, 0, 5, 5);
+		for (int i = 0; i < 8; i++) {
+			for (int j = 0; j < 8; j++) {
+				Cell c = board[i][j];
+				try {
+					c.drawCell(gc);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
+	}
 	
+	@Override
+	public Dimension getPreferredSize() {
+		return new Dimension(750, 750);
+	}
 }

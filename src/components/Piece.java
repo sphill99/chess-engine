@@ -13,13 +13,6 @@ public class Piece {
 		this.t = t;
 		this.val = t.getVal();
 	}
-	
-	
-	public static List<Cell[][]> getMoves(Piece p, ChessBoard cb, int x, int y) {
-		List<Cell[][]> moves = new ArrayList<>();
-		
-		return moves;
-	}
 		
 	public boolean isWhite() {
 		return isWhite;
